@@ -34,6 +34,7 @@ public class ActionDoneParser
     long count;
     private int addObjectActions = 0;
     private int editObjectsActions = 0;
+    private int getCatalogsActions = 0;
     private int getListActions = 0;
     private int commentActions = 0;
 
@@ -65,7 +66,7 @@ public class ActionDoneParser
         nan = count == 0;
     }
 
-    public int geListActions()
+    public int getListActions()
     {
         return getListActions;
     }
@@ -79,6 +80,8 @@ public class ActionDoneParser
     {
         return addObjectActions;
     }
+
+    public int getCatalogsActions() {return getCatalogsActions; }
 
     public int getCommentActions()
     {
@@ -185,6 +188,10 @@ public class ActionDoneParser
             else if (actionInLowerCase.equals("editobjectaction"))
             {
                 editObjectsActions++;
+            }
+            else if (actionInLowerCase.equals("getcatalogsaction"))
+            {
+                getCatalogsActions++;
             }
             else if (actionInLowerCase.matches("(?i)[a-zA-Z]+comment[a-zA-Z]+"))
             {

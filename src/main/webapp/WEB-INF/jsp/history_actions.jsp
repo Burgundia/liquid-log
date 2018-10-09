@@ -27,6 +27,7 @@
     Number times[] = (Number[])request.getAttribute(Constants.TIME);
     Number add[]=  (Number[])request.getAttribute(Constants.PerformedActions.ADD_ACTIONS);
     Number edit[] = (Number[])request.getAttribute(Constants.PerformedActions.EDIT_ACTIONS);
+    Number catalog[] = (Number[])request.getAttribute(Constants.PerformedActions.CATALOG_ACTIONS);
     Number list[] = (Number[])request.getAttribute(Constants.PerformedActions.LIST_ACTIONS);
     Number comment[] = (Number[])request.getAttribute(Constants.PerformedActions.COMMENT_ACTIONS);
     Number form[] = (Number[])request.getAttribute(Constants.PerformedActions.GET_FORM_ACTIONS);
@@ -96,10 +97,11 @@
 <div class="scroll-container">
 	<table class="table table-fixed header-fixed">
         <thead class="thead-inverse">
-            <th class="col-xs-4">Time</th>
+            <th class="col-xs-3">Time</th>
             <th class="col-xs-1">Summ</th>
-            <th class="col-xs-1">Addobject</th>
+            <th class="col-xs-1">AddObject</th>
             <th class="col-xs-1">EditObject</th>
+            <th class="col-xs-1">Catalog</th>
             <th class="col-xs-1">GetList</th>
             <th class="col-xs-1">Comment</th>
             <th class="col-xs-1">GetForm</th>
@@ -109,17 +111,20 @@
         <tbody >
             <% for(int i=0;i<times.length;i++) {%>
                 <tr class="row">
-                    <td class="col-xs-4" style="text-align:center;">
+                    <td class="col-xs-3" style="text-align:center;">
                        <%= new java.util.Date(times[i].longValue()).toString() %>
                     </td>
                     <td class="col-xs-1">
                         <%= actionsSumm[i].intValue() %>
                     </td>
-                    <td class="col-xs-1" >
+                    <td class="col-xs-1">
                         <%= add[i].intValue() %>
                     </td>
                     <td class="col-xs-1">
                         <%= edit[i].intValue() %>
+                    </td>
+                    <td class="col-xs-1">
+                        <%= catalog[i].intValue() %>
                     </td>
                     <td class="col-xs-1">
                         <%= list[i].intValue() %>
@@ -147,6 +152,7 @@
 var times = [];
 var add = [];
 var edit = [];
+var catalog =[];
 var list = [];
 var comment = [];
 var form = [];
@@ -158,6 +164,7 @@ var summ = [];
     times.push((<%=times[i]%>));
     add.push([new Date(<%= times[i] %>), <%= add[i].intValue() %>]);
     edit.push([new Date(<%= times[i] %>), <%= edit[i].intValue() %>]);
+    catalog.push([new Date(<%= times[i] %>), <%= catalog[i].intValue() %>]);
     list.push([new Date(<%= times[i] %>), <%= list[i].intValue() %>]);
     comment.push([new Date(<%= times[i] %>), <%= comment[i].intValue() %>]);
     form.push([new Date(<%= times[i] %>), <%= form[i].intValue() %>]);
@@ -174,6 +181,9 @@ if(localStorage.getItem('addActions')==null){
 }
 if(localStorage.getItem('editActions')==null){
     localStorage.setItem('editActions', 'false');
+}
+if(localStorage.getItem('catalogActions')==null){
+    localStorage.setItem('catalogActions', 'false');
 }
 if(localStorage.getItem('listActions')==null){
     localStorage.setItem('listActions', 'true');
@@ -196,6 +206,7 @@ if(localStorage.getItem('summary')==null){
 
 var addVisible = localStorage.getItem('addActions')==='true';
 var editVisible = localStorage.getItem('editActions')==='true';
+var catalogVisible = localStorage.getItem('catalogActions')==='true';
 var listVisible = localStorage.getItem('listActions')==='true';
 var commentVisible = localStorage.getItem('commentActions')==='true';
 var	formVisible = localStorage.getItem('formActions')==='true';
@@ -265,22 +276,25 @@ var myChart = Highcharts.chart('actions-chart-container', {
                             localStorage.setItem('editActions', !series[1].visible);
                         }
                         if(event.target.index==2){
-                            localStorage.setItem('listActions', !series[2].visible);
+                            localStorage.setItem('catalogActions', !series[2].visible);
                         }
                         if(event.target.index==3){
-                            localStorage.setItem('commentActions', !series[3].visible);
+                            localStorage.setItem('listActions', !series[3].visible);
                         }
                         if(event.target.index==4){
-                            localStorage.setItem('formActions', !series[4].visible);
+                            localStorage.setItem('commentActions', !series[4].visible);
                         }
                         if(event.target.index==5){
-                            localStorage.setItem('dtObjectActions', !series[5].visible);
+                            localStorage.setItem('formActions', !series[5].visible);
                         }
                         if(event.target.index==6){
-                            localStorage.setItem('searchActions', !series[6].visible);
+                            localStorage.setItem('dtObjectActions', !series[6].visible);
                         }
                         if(event.target.index==7){
-                            localStorage.setItem('summary', !series[7].visible);
+                            localStorage.setItem('searchActions', !series[7].visible);
+                        }
+                        if(event.target.index==8){
+                            localStorage.setItem('summary', !series[8].visible);
                         }
                     }
                 }
@@ -294,6 +308,11 @@ var myChart = Highcharts.chart('actions-chart-container', {
         }, {
             name: 'EditObject',
             data: edit,
+            visible: editVisible,
+            turboThreshold: 10000
+        }, {
+            name:'Catalog',
+            data: catalog,
             visible: editVisible,
             turboThreshold: 10000
         }, {
