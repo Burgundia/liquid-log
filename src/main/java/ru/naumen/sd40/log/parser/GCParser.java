@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-public class GCParser
+public class GCParser implements DataParser
 {
-    public final static class GCTimeParser
+    public final static class GCTimeParser implements TimeParser
     {
         private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ",
                 new Locale("ru", "RU"));
@@ -33,6 +33,7 @@ public class GCParser
             DATE_FORMAT.setTimeZone(TimeZone.getTimeZone(timeZone));
         }
 
+        @Override
         public long parseTime(String line) throws ParseException
         {
             Matcher matcher = PATTERN.matcher(line);
@@ -69,7 +70,7 @@ public class GCParser
         return getGcTimes() == 0;
     }
 
-    public void parseLine(String line)
+    public void parseData(String line)
     {
         Matcher matcher = gcExecutionTime.matcher(line);
         if (matcher.find())

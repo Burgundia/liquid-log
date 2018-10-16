@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * @author dkolmogortsev
  *
  */
-public class TopParser
+public class TopParser implements TimeParser, DataParser
 {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH:mm");
@@ -52,29 +52,28 @@ public class TopParser
         sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
     }
 
-    public void parse() throws IOException, ParseException
-    {
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName)))
-        {
-            String line;
-            while ((line = br.readLine()) != null)
-            {
-                parseLine(line);
-            }
-        }
-    }
+//    public void parse() throws IOException, ParseException
+//    {
+//        try (BufferedReader br = new BufferedReader(new FileReader(fileName)))
+//        {
+//            String line;
+//            while ((line = br.readLine()) != null)
+//            {
+//                parseData(line);
+//            }
+//        }
+//    }
 
-    private void parseLine(String line) throws IOException, ParseException
-    {
+    public long parseTime(String line) throws ParseException {
         //check time
-        long time = 0;
+        long time = 0L;
         Matcher matcher = timeRegex.matcher(line);
         if (matcher.find())
-        {
-            time = prepareDate(sdf.parse(dataDate + matcher.group(1)).getTime());
-            currentSet = existing.computeIfAbsent(time, k -> new DataSet());
-            return;
-        }
+            time = sdf.parse(dataDate + matcher.group(1)).getTime();
+        return time;
+    }
+    public void parseData(String line)
+    {
         if (currentSet != null)
         {
             //get la
@@ -96,11 +95,11 @@ public class TopParser
         }
     }
 
-    private long prepareDate(long parsedDate)
-    {
-        int min5 = 5 * 60 * 1000;
-        long count = parsedDate / min5;
-        return count * min5;
-    }
+//    private long prepareDate(long parsedDate)
+//    {
+//        int min5 = 5 * 60 * 1000;
+//        long count = parsedDate / min5;
+//        return count * min5;
+//    }
 
 }

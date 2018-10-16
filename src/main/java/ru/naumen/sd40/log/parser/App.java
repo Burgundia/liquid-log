@@ -53,11 +53,11 @@ public class App
 
         HashMap<Long, DataSet> data = new HashMap<>();
 
-        TimeParser timeParser = new TimeParser();
+        SdngTimeParser sdngTimeParser = new SdngTimeParser();
         GCTimeParser gcTime = new GCTimeParser();
         if (args.length > 2)
         {
-            timeParser = new TimeParser(args[2]);
+            sdngTimeParser = new SdngTimeParser(args[2]);
             gcTime = new GCTimeParser(args[2]);
         }
 
@@ -66,46 +66,11 @@ public class App
         {
         case "sdng":
             //Parse sdng
-            try (BufferedReader br = new BufferedReader(new FileReader(log), 32 * 1024 * 1024))
-            {
-                String line;
-                while ((line = br.readLine()) != null)
-                {
-                    long time = timeParser.parseLine(line);
-
-                    if (time == 0)
-                    {
-                        continue;
-                    }
-
-                    int min5 = 5 * 60 * 1000;
-                    long count = time / min5;
-                    long key = count * min5;
-
-                    data.computeIfAbsent(key, k -> new DataSet()).parseLine(line);
-                }
-            }
+            readDataFromBuffer(log, data, sdngTimeParser);
             break;
         case "gc":
             //Parse gc log
-            try (BufferedReader br = new BufferedReader(new FileReader(log)))
-            {
-                String line;
-                while ((line = br.readLine()) != null)
-                {
-                    long time = gcTime.parseTime(line);
-
-                    if (time == 0)
-                    {
-                        continue;
-                    }
-
-                    int min5 = 5 * 60 * 1000;
-                    long count = time / min5;
-                    long key = count * min5;
-                    data.computeIfAbsent(key, k -> new DataSet()).parseGcLine(line);
-                }
-            }
+            readDataFromBuffer(log, data, gcTime);
             break;
         case "top":
             TopParser topParser = new TopParser(log, data);
@@ -114,7 +79,7 @@ public class App
                 topParser.configureTimeZone(args[2]);
             }
             //Parse top
-            topParser.parse();
+            readDataFromBuffer(log, data, topParser);
             break;
         default:
             throw new IllegalArgumentException(
@@ -155,5 +120,23 @@ public class App
             }
         });
         storage.writeBatch(points);
+    }
+    private static void readDataFromBuffer(String log, HashMap<Long, DataSet> data, TimeParser timeParser) throws IOException, ParseException {
+        try (BufferedReader br = new BufferedReader(new FileReader(log), 32 * 1024 * 1024)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                long time = timeParser.parseTime(line);
+
+                if (time == 0) {
+                    continue;
+                }
+
+                int min5 = 5 * 60 * 1000;
+                long count = time / min5;
+                long key = count * min5;
+
+                data.computeIfAbsent(key, k -> new DataSet()).parseLine(line, timeParser);
+            }
+        }
     }
 }
